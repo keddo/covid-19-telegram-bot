@@ -23,6 +23,10 @@ class Bot
                 continent = text.length > 2 ? (text[1] + ' ' + text[2]) : text[1]
                 res = ApiRequest.getstatusByContinent(continent)
                 bot.api.send_message(chat_id: message.chat.id, text: ApiRequest.printContinentStatus(res), date: message.date)
+              when %r{^/highest}
+                text = message.text.split(' ')
+                str = ApiRequest.getCountriesWithTopCases(text[1].to_i)
+              bot.api.send_message(chat_id: message.chat.id, text: str, date: message.date)
               when '/stop'
                 bot.api.send_message(chat_id: message.chat.id, text: "Bye, #{message.from.first_name}")
               end

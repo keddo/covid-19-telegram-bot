@@ -30,6 +30,21 @@ class ApiRequest
     response = response.select { |hash| continent.split.map(&:capitalize).join(' ') == hash['continent'] }
     response[0]
   end
+  
+  def self.getCountriesWithTopCases(number)
+     url = COUNTRIES_URL + "?sort=cases"
+     response = jsonResponse(url)
+     countries = {}
+     number.times do |i|
+        countries[response[i]['country']] = response[i]['cases']
+     end
+     str = ""
+     countries.each do |k, v|
+      str += printTopCases(k, v) + "\n"
+     end
+     str
+  end
+
 
   def self.printGlobalStatus(res)
     <<~HEREDOC 
@@ -108,12 +123,15 @@ class ApiRequest
       /global - returns global cases
       /country countryname|code - return COVID status of the country
       /continent content name - return COVID status of the continent
+      /highest  number - countries with highest number of cases upto the number
       -------------------------------
      | Powered by Kedir A.      
       -------------------------------
       HEREDOC
   end
-
+  def self.printTopCases(country, cases)
+    "#{country} : #{cases.to_s.reverse.gsub(/...(?=.)/,'\&,').reverse}"
+  end
   def self.help
       <<~HEREDOC
       Welcome to Covid-19_bot help center
@@ -125,5 +143,13 @@ class ApiRequest
      | Powered by Kedir A.      
       -------------------------------
       HEREDOC
+  end
+
+  def self.jsonResponse(url)
+    escaped_address = URI.escape(url)
+    uri = URI.parse(escaped_address)
+    response = Net::HTTP.get(uri)
+    response = JSON.parse(response)
+    response
   end
 end
