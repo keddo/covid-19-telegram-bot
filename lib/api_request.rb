@@ -27,8 +27,8 @@ class ApiRequest
      uri = URI.parse(escaped_address)
     response = Net::HTTP.get(uri)
     response = JSON.parse(response)
-    response = response.select { |hash| continent.split.map(&:capitalize).join('') == hash['continent'] }
-    response
+    response = response.select { |hash| continent.split.map(&:capitalize).join(' ') == hash['continent'] }
+    response[0]
   end
 
   def self.printGlobalStatus(res)
@@ -74,7 +74,7 @@ class ApiRequest
   end
 
 
-  def self.printCountryStatus(res)
+  def self.printContinentStatus(res)
     <<~HEREDOC 
     ----------------------------------------------
     |#{res['continent']}                            
@@ -107,6 +107,7 @@ class ApiRequest
       /help - use to get help 
       /global - returns global cases
       /country countryname|code - return COVID status of the country
+      /continent content name - return COVID status of the continent
       -------------------------------
      | Powered by Kedir A.      
       -------------------------------
