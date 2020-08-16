@@ -130,7 +130,10 @@ class ApiRequest
       HEREDOC
   end
   def self.printTopCases(country, cases)
-    "#{country} : #{cases.to_s.reverse.gsub(/...(?=.)/,'\&,').reverse}"
+    '----------------------' +
+    "|#{country} : #{cases.to_s.reverse.gsub(/...(?=.)/,'\&,').reverse}"
+    +
+    '---------------------'
   end
   def self.help
       <<~HEREDOC
