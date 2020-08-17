@@ -7,27 +7,27 @@ class ApiRequest
     response
   end
 
-  def self.status_by_country(country)
-    url = COUNTRIES_URL + "/" + country
+  def self.status_by_country(cry)
+    url = COUNTRIES_URL + '/' + cry
     response = json_response(url)
     response
   end
 
-  def self.status_by_continent(continent)
+  def self.status_by_continent(con)
     url = CONTINENT_URL
     response = json_response(url)
-    response = response.select { |hash| continent.split.map(&:capitalize).join(' ') == hash['continent'] }
+    response = response.select { |hash| con.split.map(&:capitalize).join(' ') == hash['continent'] }
     response[0]
   end
 
-  def self.top_cases(number)
+  def self.top_cases(num)
     url = COUNTRIES_URL + '?sort=cases'
     response = json_response(url)
     countries = {}
-    number.times do |i|
+    num.times do |i|
       countries[response[i]['country']] = response[i]['cases']
     end
-    str = ""
+    str = ''
     i = 1
     countries.each do |k, v|
       str += print_top_cases(k, v, i) + "\n"
@@ -36,12 +36,12 @@ class ApiRequest
     str
   end
 
-  def self.historical(last_days, country)
-    url = HISTORICAL_URL + '?lastdays=' + last_days
+  def self.historical(day, cry)
+    url = HISTORICAL_URL + '?lastdays=' + day
     response = json_response(url)
-    result = response.select { |data|  data['country']  == country.split.map(&:capitalize).join(' ')}
+    result = response.select { |data| data['country'] == cry.split.map(&:capitalize).join(' ') }
     str = "#{result[0]['country']}\n"
-    result[0]['timeline']['cases'].each { |k, v| str += print_history(k, v)}
+    result[0]['timeline']['cases'].each { |k, v| str += print_history(k, v) }
     str
   end
 
@@ -111,8 +111,8 @@ class ApiRequest
     HEREDOC
   end
 
-  def self.print_history(k, v)
-    "\n-----------------------\n| #{k} | #{v.to_s.reverse.gsub(/...(?=.)/, '\&,').reverse}"
+  def self.print_history(key, val)
+    "\n-----------------------\n| #{key} | #{val.to_s.reverse.gsub(/...(?=.)/, '\&,').reverse}"
   end
 
   def self.instroduction
@@ -137,8 +137,8 @@ class ApiRequest
     HEREDOC
   end
 
-  def self.print_top_cases(country, cases, i)
-    "-----------------------\n| #{i} | #{country} : #{cases.to_s.reverse.gsub(/...(?=.)/, '\&,').reverse}"
+  def self.print_top_cases(cry, cas, num)
+    "-----------------------\n| #{num} | #{cry} : #{cas.to_s.reverse.gsub(/...(?=.)/, '\&,').reverse}"
   end
 
   def self.help
