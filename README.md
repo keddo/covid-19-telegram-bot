@@ -17,19 +17,50 @@ To get this project up and running locally, you must already have ruby installed
 
 ## Getting Started
 
-**To get this project set up on your local machine, follow these simple steps:**
+- Download the [telegram](https://telegram.org/) for you mobile or computer
+- Create a new account if you don't have one already
+- In the search tab search for `@getcovidstatus_bot` or [click the this link](http://t.me/getcovidstatus_bot) to get the bot
+- start the bot or using /start
+- You are now ready to use the bot to get the latest COVID-19 updates
 
-To get your own copy of our project simply clone the repository to your local machine.
+### Usage
 
-**Step 1**: Type the following command into a git shell
+You can interact with the bot in two ways.
+**Enter the following to interact with the bot:**
 
-_git clone <https://github.com/keddo/covid-19-telegram-bot.git>_
+- `/start` to get general information what to input to make insteraction with the bot.
+- `/global` to get global cases
+- `/country countryname` to get latest statistics of the country
+  example: sending /country ethiopia will get you latest numbers of cases in ethiopia
+- `/history countryname numberofdays` to get history of covid-19 of a country for a given number of days.
+- `/continent continentName` to get covid-19 status for a continent.
+- `/help` - get help with the bot.
+- example: sending /history ethiopia 5 will get you history of ethiopia's status for the last five days.
+- `/stop` to stop the bot
 
-**Step 2**: Direct a terminal into the cloned repository directory
+## Development
 
-_cd covid-19-telegram-bot_
+### Prerequisites
 
-**Step 4**: run ruby bin/main.rb
+Since all the code is written using ruby `Ruby Runtime >= 1.9` ruby is required to interpret the code. if you don't have ruby runtime installed on your computer follow the instruction for your specific operating system on the [official installation guide](https://www.ruby-lang.org/en/documentation/installation/)
+
+### Get source file
+
+once you have setup all the prerequisites clone the repository on your development enviroment
+
+`https://github.com/keddo/covid-19-telegram-bot.git`
+
+Install all the gem dependencies for the project
+
+`bundle install`
+
+Install development enviroment setup packages
+
+`npm install`
+
+run the application
+
+`ruby bin/main.rb`
 
 ## Authors
 
