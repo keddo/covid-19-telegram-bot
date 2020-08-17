@@ -2,153 +2,161 @@ require 'net/http'
 require 'json'
 require_relative 'config'
 class ApiRequest
-  attr_accessor :request_token;
-
-  def self.getGlobalStatus
-    escaped_address = URI.escape(GLOBAL_URL)
-    uri = URI.parse(escaped_address)
-    response = Net::HTTP.get(uri)
-    response = JSON.parse(response)
+  def self.global_status
+    response = json_response(GLOBAL_URL)
     response
   end
 
-  def self.getstatusByCountry(country)
-      url = COUNTRIES_URL + "/" + country
-     escaped_address = URI.escape(url)
-     uri = URI.parse(escaped_address)
-    response = Net::HTTP.get(uri)
-    response = JSON.parse(response)
+  def self.status_by_country(country)
+    url = COUNTRIES_URL + "/" + country
+    response = json_response(url)
     response
   end
 
-  def self.getstatusByContinent(continent)
-      url = CONTINENT_URL
-     escaped_address = URI.escape(url)
-     uri = URI.parse(escaped_address)
-    response = Net::HTTP.get(uri)
-    response = JSON.parse(response)
+  def self.status_by_continent(continent)
+    url = CONTINENT_URL
+    response = json_response(url)
     response = response.select { |hash| continent.split.map(&:capitalize).join(' ') == hash['continent'] }
     response[0]
   end
-  
-  def self.getCountriesWithTopCases(number)
-     url = COUNTRIES_URL + "?sort=cases"
-     response = jsonResponse(url)
-     countries = {}
-     number.times do |i|
-        countries[response[i]['country']] = response[i]['cases']
-     end
-     str = ""
-     countries.each do |k, v|
-      str += printTopCases(k, v) + "\n"
-     end
-     str
+
+  def self.top_cases(number)
+    url = COUNTRIES_URL + '?sort=cases'
+    response = json_response(url)
+    countries = {}
+    number.times do |i|
+      countries[response[i]['country']] = response[i]['cases']
+    end
+    str = ""
+    i = 1
+    countries.each do |k, v|
+      str += print_top_cases(k, v, i) + "\n"
+      i += 1
+    end
+    str
   end
 
+  def self.historical(last_days, country)
+    url = HISTORICAL_URL + '?lastdays=' + last_days
+    response = json_response(url)
+    result = response.select { |data|  data['country']  == country.split.map(&:capitalize).join(' ')}
+    str = "#{result[0]['country']}\n"
+    result[0]['timeline']['cases'].each { |k, v| str += print_history(k, v)}
+    str
+  end
 
-  def self.printGlobalStatus(res)
-    <<~HEREDOC 
-    ----------------------------------------------
-    |              Worldwide                     
-    ----------------------------------------------
-    | Total Cases: #{res['cases'].to_s.reverse.gsub(/...(?=.)/,'\&,').reverse}         
-    ----------------------------------------------
-    | Today Cases: #{res['todayCases'].to_s.reverse.gsub(/...(?=.)/,'\&,').reverse}            
-    ----------------------------------------------
-    | Critical: #{res['critical'].to_s.reverse.gsub(/...(?=.)/,'\&,').reverse}                
-    ----------------------------------------------
-    | Total Deaths: #{res['deaths'].to_s.reverse.gsub(/...(?=.)/,'\&,').reverse}              
-    ----------------------------------------------
-    | Total Recovered: #{res['recovered'].to_s.reverse.gsub(/...(?=.)/,'\&,').reverse}    
-    ----------------------------------------------
-    | Active: #{res['active'].to_s.reverse.gsub(/...(?=.)/,'\&,').reverse}                    
-    ----------------------------------------------    
+  def self.print_global_status(res)
+    <<~HEREDOC
+      ----------------------------------------------
+      |              Worldwide                     
+      ----------------------------------------------
+      | Total Cases: #{res['cases'].to_s.reverse.gsub(/...(?=.)/, '\&,').reverse}         
+      ----------------------------------------------
+      | Today Cases: #{res['todayCases'].to_s.reverse.gsub(/...(?=.)/, '\&,').reverse}            
+      ----------------------------------------------
+      | Critical: #{res['critical'].to_s.reverse.gsub(/...(?=.)/, '\&,').reverse}                
+      ----------------------------------------------
+      | Total Deaths: #{res['deaths'].to_s.reverse.gsub(/...(?=.)/, '\&,').reverse}              
+      ----------------------------------------------
+      | Total Recovered: #{res['recovered'].to_s.reverse.gsub(/...(?=.)/, '\&,').reverse}    
+      ----------------------------------------------
+      | Active: #{res['active'].to_s.reverse.gsub(/...(?=.)/, '\&,').reverse}                    
+      ----------------------------------------------    
     HEREDOC
   end
 
-  def self.printCountryStatus(res)
-      <<~HEREDOC 
+  def self.print_country_status(res)
+    <<~HEREDOC
       ----------------------------------------------
       |#{res['country']}                            
       ----------------------------------------------
-      | New Confirmed: #{res['todayCases'].to_s.reverse.gsub(/...(?=.)/,'\&,').reverse}         
+      | New Confirmed: #{res['todayCases'].to_s.reverse.gsub(/...(?=.)/, '\&,').reverse}         
       ----------------------------------------------
-      | Total Confirmed: #{res['cases'].to_s.reverse.gsub(/...(?=.)/,'\&,').reverse}            
+      | Total Confirmed: #{res['cases'].to_s.reverse.gsub(/...(?=.)/, '\&,').reverse}            
       ----------------------------------------------
-      | Critical: #{res['critical'].to_s.reverse.gsub(/...(?=.)/,'\&,').reverse}                
+      | Critical: #{res['critical'].to_s.reverse.gsub(/...(?=.)/, '\&,').reverse}                
       ----------------------------------------------
-      | Total Deaths: #{res['deaths'].to_s.reverse.gsub(/...(?=.)/,'\&,').reverse}              
+      | Total Deaths: #{res['deaths'].to_s.reverse.gsub(/...(?=.)/, '\&,').reverse}              
       ----------------------------------------------
-      | Total Recovered: #{res['recovered'].to_s.reverse.gsub(/...(?=.)/,'\&,').reverse}        
+      | Total Recovered: #{res['recovered'].to_s.reverse.gsub(/...(?=.)/, '\&,').reverse}        
       ----------------------------------------------
-      | Total Affected: #{res['affectedCountries'].to_s.reverse.gsub(/...(?=.)/,'\&,').reverse} 
+      | Total Affected: #{res['affectedCountries'].to_s.reverse.gsub(/...(?=.)/, '\&,').reverse} 
       ----------------------------------------------
-      | Active: #{res['active'].to_s.reverse.gsub(/...(?=.)/,'\&,').reverse}                    
+      | Active: #{res['active'].to_s.reverse.gsub(/...(?=.)/, '\&,').reverse}                    
       ----------------------------------------------    
-      HEREDOC
-  end
-
-
-  def self.printContinentStatus(res)
-    <<~HEREDOC 
-    ----------------------------------------------
-    |#{res['continent']}                            
-    ----------------------------------------------
-    | New Confirmed: #{res['todayCases'].to_s.reverse.gsub(/...(?=.)/,'\&,').reverse}         
-    ----------------------------------------------
-    | Total Confirmed: #{res['cases'].to_s.reverse.gsub(/...(?=.)/,'\&,').reverse}            
-    ----------------------------------------------
-    | Critical: #{res['critical'].to_s.reverse.gsub(/...(?=.)/,'\&,').reverse}                
-    ----------------------------------------------
-    | Today Deaths: #{res['todayDeaths'].to_s.reverse.gsub(/...(?=.)/,'\&,').reverse}              
-    ----------------------------------------------
-    | Total Deaths: #{res['deaths'].to_s.reverse.gsub(/...(?=.)/,'\&,').reverse}              
-    ----------------------------------------------
-    | Today Recovered: #{res['todayRecovered'].to_s.reverse.gsub(/...(?=.)/,'\&,').reverse} 
-    ----------------------------------------------
-    | Total Recovered: #{res['recovered'].to_s.reverse.gsub(/...(?=.)/,'\&,').reverse} 
-    ----------------------------------------------
-    | Active: #{res['active'].to_s.reverse.gsub(/...(?=.)/,'\&,').reverse}                    
-    ----------------------------------------------    
     HEREDOC
   end
-  def self.instroduction
-      <<~HEREDOC
-      Welcome to COVID-19 bot, this bot is using the disease service API 
-      to generate information about COVID-19 based on the options 
-      you enter so please enter from the given chooses and 
-      the bot will reply:
-      /start - give main information about the bot
-      /help - use to get help 
-      /global - returns global cases
-      /country countryname|code - return COVID status of the country
-      /continent content name - return COVID status of the continent
-      /highest  number - countries with highest number of cases upto the number
-      -------------------------------
-     | Powered by Kedir A.      
-      -------------------------------
-      HEREDOC
-  end
-  def self.printTopCases(country, cases)
-    '----------------------' +
-    "|#{country} : #{cases.to_s.reverse.gsub(/...(?=.)/,'\&,').reverse}"
-    +
-    '---------------------'
-  end
-  def self.help
-      <<~HEREDOC
-      Welcome to Covid-19_bot help center
-      1. In case of searching for a country  you must use space
-      bewtween /country & the country name or code
-      2. Make sure country name is spelt correctly.
-      3. We will add more help ASAP.
-      -------------------------------
-     | Powered by Kedir A.      
-      -------------------------------
-      HEREDOC
+
+  def self.print_continent_status(res)
+    <<~HEREDOC
+      ----------------------------------------------
+      |#{res['continent']}                            
+      ----------------------------------------------
+      | New Confirmed: #{res['todayCases'].to_s.reverse.gsub(/...(?=.)/, '\&,').reverse}         
+      ----------------------------------------------
+      | Total Confirmed: #{res['cases'].to_s.reverse.gsub(/...(?=.)/, '\&,').reverse}            
+      ----------------------------------------------
+      | Critical: #{res['critical'].to_s.reverse.gsub(/...(?=.)/, '\&,').reverse}                
+      ----------------------------------------------
+      | Today Deaths: #{res['todayDeaths'].to_s.reverse.gsub(/...(?=.)/, '\&,').reverse}              
+      ----------------------------------------------
+      | Total Deaths: #{res['deaths'].to_s.reverse.gsub(/...(?=.)/, '\&,').reverse}              
+      ----------------------------------------------
+      | Today Recovered: #{res['todayRecovered'].to_s.reverse.gsub(/...(?=.)/, '\&,').reverse} 
+      ----------------------------------------------
+      | Total Recovered: #{res['recovered'].to_s.reverse.gsub(/...(?=.)/, '\&,').reverse} 
+      ----------------------------------------------
+      | Active: #{res['active'].to_s.reverse.gsub(/...(?=.)/, '\&,').reverse}                    
+      ----------------------------------------------    
+    HEREDOC
   end
 
-  def self.jsonResponse(url)
+  def self.print_history(k, v)
+    "\n-----------------------\n| #{k} | #{v.to_s.reverse.gsub(/...(?=.)/, '\&,').reverse}"
+  end
+
+  def self.instroduction
+    <<~HEREDOC
+       Welcome to COVID-19 bot, this bot is using the disease service API 
+       to generate information about COVID-19 based on the options 
+       you enter so please enter from the given chooses and 
+       the bot will reply:
+       /start - give main information about the bot
+       /help - use to get help 
+       /global - returns global cases
+       /country countryname|code - return COVID status of the country
+       /continent content name - return COVID status of the continent
+       /highest  number - countries with highest number of cases upto 
+        the number
+       /history  CountryName numberofdays - show the history of 
+       COVID-19 cases of the country for the given number 
+       of days . 
+       -------------------------------
+      | Powered by Kedir A.      
+       -------------------------------
+    HEREDOC
+  end
+
+  def self.print_top_cases(country, cases, i)
+    "-----------------------\n| #{i} | #{country} : #{cases.to_s.reverse.gsub(/...(?=.)/, '\&,').reverse}"
+  end
+
+  def self.help
+    <<~HEREDOC
+       Welcome to Covid-19_bot help center
+       1. In case of searching for a country  you must use space
+       bewtween /country & the country name or code -> eg. /country Ethiopia
+       2. Make sure country name is spelt correctly.
+       3. After /highest use a number -> eg. /highest 5.
+       4. To get the histor of  your country or any send request to the bot
+       as eg. /history Ethiopia 5 
+       -------------------------------
+      | Powered by Kedir A.      
+       -------------------------------
+    HEREDOC
+  end
+
+  def self.json_response(url)
     escaped_address = URI.escape(url)
     uri = URI.parse(escaped_address)
     response = Net::HTTP.get(uri)
