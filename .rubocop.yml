@@ -32,7 +32,10 @@ Style/DefWithParentheses:
   Enabled: false
 Style/FrozenStringLiteralComment:
   EnforcedStyle: never
-
+Lint/ParenthesesAsGroupedExpression:
+  Enabled: false
+Style/BlockDelimiters:
+  Enabled: false
 Layout/HashAlignment:
   EnforcedColonStyle: key
 Layout/ExtraSpacing:
@@ -51,4 +54,8 @@ Style/HashEachMethods:
 Style/HashTransformKeys:
   Enabled: false
 Style/HashTransformValues:
+  Enabled: false
+Style/NestedParenthesizedCalls:
+  Enabled: false
+Style/RedundantParentheses:
   Enabled: false
