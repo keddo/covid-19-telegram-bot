@@ -2,25 +2,29 @@ require 'net/http'
 require 'json'
 require_relative 'config'
 class ApiRequest
-  def self.global_status
+  def initialize; end
+
+  def global_status
     response = json_response(GLOBAL_URL)
     response
   end
 
-  def self.status_by_country(cry)
+  def status_by_country(cry)
+    return "Country don't exist" if country_exist(cry).empty?
+
     url = COUNTRIES_URL + '/' + cry
     response = json_response(url)
     response
   end
 
-  def self.status_by_continent(con)
+  def status_by_continent(con)
     url = CONTINENT_URL
     response = json_response(url)
     response = response.select { |hash| con.split.map(&:capitalize).join(' ') == hash['continent'] }
     response[0]
   end
 
-  def self.top_cases(num)
+  def top_cases(num)
     url = COUNTRIES_URL + '?sort=cases'
     response = json_response(url)
     countries = {}
@@ -36,7 +40,7 @@ class ApiRequest
     str
   end
 
-  def self.historical(day, cry)
+  def historical(day, cry)
     url = HISTORICAL_URL + '?lastdays=' + day
     response = json_response(url)
     result = response.select { |data| data['country'] == cry.split.map(&:capitalize).join(' ') }
@@ -45,7 +49,7 @@ class ApiRequest
     str
   end
 
-  def self.print_global_status(res)
+  def print_global_status(res)
     <<~HEREDOC
       ----------------------------------------------
       |              Worldwide                     
@@ -65,7 +69,7 @@ class ApiRequest
     HEREDOC
   end
 
-  def self.print_country_status(res)
+  def print_country_status(res)
     <<~HEREDOC
       ----------------------------------------------
       |#{res['country']}                            
@@ -87,7 +91,7 @@ class ApiRequest
     HEREDOC
   end
 
-  def self.print_continent_status(res)
+  def print_continent_status(res)
     <<~HEREDOC
       ----------------------------------------------
       |#{res['continent']}                            
@@ -111,11 +115,11 @@ class ApiRequest
     HEREDOC
   end
 
-  def self.print_history(key, val)
+  def print_history(key, val)
     "\n-----------------------\n| #{key} | #{val.to_s.reverse.gsub(/...(?=.)/, '\&,').reverse}"
   end
 
-  def self.instroduction
+  def instroduction
     <<~HEREDOC
        Welcome to COVID-19 bot, this bot is using the disease service API 
        to generate information about COVID-19 based on the options 
@@ -137,11 +141,11 @@ class ApiRequest
     HEREDOC
   end
 
-  def self.print_top_cases(cry, cas, num)
+  def print_top_cases(cry, cas, num)
     "-----------------------\n| #{num} | #{cry} : #{cas.to_s.reverse.gsub(/...(?=.)/, '\&,').reverse}"
   end
 
-  def self.help
+  def help
     <<~HEREDOC
        Welcome to Covid-19_bot help center
        1. In case of searching for a country  you must use space
@@ -156,7 +160,23 @@ class ApiRequest
     HEREDOC
   end
 
-  def self.json_response(url)
+  private
+
+  def country_exist(ctry)
+    country = ''
+    countries = included_countries
+    countries.each { |c| country = c if c == ctry.split.map(&:capitalize).join(' ') } 
+    country
+  end
+
+  def included_countries
+    data = json_response('https://disease.sh/v3/covid-19/countries')
+    countries = []
+    data.each { |country| countries << country['country'] }
+    countries
+  end
+
+  def json_response(url)
     escaped_address = URI.escape(url)
     uri = URI.parse(escaped_address)
     response = Net::HTTP.get(uri)
