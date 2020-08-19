@@ -11,65 +11,61 @@ describe ApiRequest do
       "active": 0,
       "critical": 0 }
   }
+  let (:api) { ApiRequest.new }
   describe '#global_status' do
     it 'Test if it returns Hash' do
-      expect(ApiRequest.global_status.is_a?(Hash)).to eql(({}).is_a?(Hash))
+      expect(api.global_status.is_a?(Hash)).to eql(({}).is_a?(Hash))
     end
   end
 
   describe '#status_by_country' do
     it 'Test if the expected value is Hash' do
-      expect(ApiRequest.status_by_country('Ethiopia').is_a?(Hash)).to eql(({}).is_a?(Hash))
+      expect(api.status_by_country('Ethiopia').is_a?(Hash)).to eql(({}).is_a?(Hash))
     end
   end
   describe '#status_by_continent' do
     it 'Test if the array contains expected value' do
-      expect(ApiRequest.status_by_continent('Africa').is_a?(Hash)).to eql(({}).is_a?(Hash))
+      expect(api.status_by_continent('Africa').is_a?(Hash)).to eql(({}).is_a?(Hash))
     end
   end
   describe '#top_cases' do
     it 'Test if it returns a string value' do
-      expect(ApiRequest.top_cases(5).is_a?(String)).to eql(true)
+      expect(api.top_cases(5).is_a?(String)).to eql(true)
     end
   end
   describe '#historical' do
     it 'Test if it returns a string value' do
-      expect(ApiRequest.historical('5', 'Ethiopia').is_a? String).to eql(true)
+      expect(api.historical('5', 'Ethiopia').is_a? String).to eql(true)
     end
   end
   describe '#print_global_status' do
     it 'Test if the is a string' do
-      expect(ApiRequest.print_global_status(res).is_a? String).to eql(true)
+      expect(api.print_global_status(res).is_a? String).to eql(true)
     end
   end
   describe '#print_country_status' do
     it 'Test if the is a string' do
-      expect(ApiRequest.print_country_status(res).is_a? String).to eql(true)
+      expect(api.print_country_status(res).is_a? String).to eql(true)
     end
   end
   describe '#print_history' do
     it 'Test if the is a string' do
-      expect(ApiRequest.print_country_status(res).is_a? String).to eql(true)
+      expect(api.print_country_status(res).is_a? String).to eql(true)
     end
   end
   describe '#instroduction' do
     it 'Test if the is a string' do
-      expect(ApiRequest.instroduction.is_a? String).to eql(true)
+      expect(api.instroduction.is_a? String).to eql(true)
     end
   end
   describe '#print_top_cases' do
     it 'Test if the is a string' do
-      expect(ApiRequest.print_top_cases('Ethiopia', 12_324, 1).is_a? String).to eql(true)
+      expect(api.print_top_cases('Ethiopia', 12_324, 1).is_a? String).to eql(true)
     end
   end
   describe '#help' do
     it 'Test if the is a string' do
-      expect(ApiRequest.help.is_a? String).to eql(true)
-    end
-  end
-  describe '#json_response' do
-    it 'Test if the is a string' do
-      expect(ApiRequest.json_response(GLOBAL_URL).is_a?(Hash)).to eql(true)
+      expect(api.help.is_a? String).to eql(true)
     end
   end
 end
