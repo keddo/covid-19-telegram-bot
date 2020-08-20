@@ -1,4 +1,4 @@
-require_relative './lib/api_request'
+require_relative '../lib/api_request'
 require_relative './lib/bot'
 require_relative './lib/config'
 describe ApiRequest do
