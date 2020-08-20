@@ -1,5 +1,5 @@
-require './lib/api_request.rb'
-require './lib/config.rb'
+require_relative './lib/api_request.rb'
+require_relative './lib/config.rb'
 describe ApiRequest do
   let (:res) {
     { "cases": 0,
