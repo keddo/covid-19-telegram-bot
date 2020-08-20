@@ -8,6 +8,7 @@ GEM
       thread_safe (~> 0.3, >= 0.3.1)
     coercible (1.0.0)
       descendants_tracker (~> 0.0.1)
+    connection_pool (2.2.3)
     descendants_tracker (0.0.4)
       thread_safe (~> 0.3, >= 0.3.1)
     equalizer (0.0.11)
@@ -16,7 +17,10 @@ GEM
     ice_nine (0.11.2)
     inflecto (0.0.2)
     jaro_winkler (1.5.4)
+    json (2.3.1)
     multipart-post (2.1.1)
+    net-http-persistent (4.0.0)
+      connection_pool (~> 2.2)
     parallel (1.19.2)
     parser (2.7.1.4)
       ast (~> 2.4.1)
@@ -47,6 +51,8 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  json
+  net-http-persistent
   rubocop (~> 0.81.0)
   telegram-bot-ruby
 
