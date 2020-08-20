@@ -1,6 +1,6 @@
 require_relative '../lib/api_request'
-require_relative './lib/bot'
-require_relative './lib/config'
+require_relative '../lib/bot'
+require_relative '../lib/config'
 describe ApiRequest do
   let (:res) {
     { "cases": 0,
