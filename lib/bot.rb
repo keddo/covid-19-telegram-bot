@@ -1,6 +1,6 @@
 require 'telegram/bot'
-require_relative './config'
-require_relative './api_request'
+require_relative 'config'
+require_relative 'api_request'
 class Bot
   def self.start_bot
     Telegram::Bot::Client.run(TOKEN) do |bot|

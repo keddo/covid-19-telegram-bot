@@ -1,5 +1,4 @@
 require './lib/api_request.rb'
-require './lib/bot.rb'
 require './lib/config.rb'
 describe ApiRequest do
   let (:res) {
