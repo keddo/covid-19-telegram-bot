@@ -1,4 +1,4 @@
-require 'telegram/bot'
+require_relative 'telegram/bot'
 require_relative 'config'
 require_relative 'api_request'
 class Bot
